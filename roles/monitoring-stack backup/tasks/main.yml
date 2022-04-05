@@ -1,0 +1,12 @@
+- name: Copying the Docker Compose Directory and its contents
+  copy:
+    src: ../files/
+    dest: /root/docker-compose/
+    owner: root
+    group: root        
+    mode: 0644
+
+- name: Run container
+  shell:
+    cmd: "docker-compose up -d"
+    chdir: /root/docker-compose/

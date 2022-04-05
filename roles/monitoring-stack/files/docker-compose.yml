@@ -1,0 +1,97 @@
+version: '3.5'
+services:
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - grafanadata:/var/lib/grafana
+      - ./provisioning/:/etc/grafana/provisioning/
+      - ./provisioning/dashboards//node-exporter-full_rev26.json:/var/lib/grafana/dashboards/node-exporter-full_rev26.json
+    networks:
+      - monitoring
+    restart: always
+    logging:
+      driver: "json-file"
+      options: 
+        tag: "{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}"
+
+  loki:
+    image: grafana/loki
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - monitoring
+    logging:
+      driver: "json-file"
+      options: 
+        tag: "{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}"
+
+  promtail:
+    image: grafana/promtail
+    volumes:
+      - /var/log:/var/log
+      - /var/lib/docker/containers:/var/lib/docker/containers
+      - /root/docker-compose/promtail-config.yml:/etc/promtail/promtail-config.yml
+    command: -config.file=/etc/promtail/promtail-config.yml
+    networks:
+      - monitoring
+    logging:
+      driver: "json-file"
+      options: 
+        tag: "{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}"
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: unless-stopped
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    ports:
+      - "9100:9100"
+    networks:
+      - monitoring
+    logging:
+      driver: "json-file"
+      options: 
+        tag: "{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}"
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    ports:
+      - "9090:9090"
+    networks:
+      - monitoring
+    logging:
+      driver: "json-file"
+      options: 
+        tag: "{{.ImageName}}|{{.Name}}|{{.ImageFullID}}|{{.FullID}}"
+
+volumes:
+  prometheus_data: {}
+  grafanadata: {}
+
+networks:
+  monitoring:
+    driver: bridge

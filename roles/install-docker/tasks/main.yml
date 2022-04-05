@@ -1,0 +1,66 @@
+- name: Check If Docker Is Installed
+  command: docker --version
+  register: docker_valid
+  ignore_errors: yes
+
+- name: Install docker packages
+  apt:
+    name: ['apt-transport-https','ca-certificates', 'curl', 'software-properties-common']
+    state: present
+    update_cache: yes
+  tags:
+    - docker
+  when: docker_valid.failed 
+
+- name: Add Docker s GPG key for ubuntu from official site
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+  tags:
+    - docker
+  when: docker_valid.failed 
+
+- name: Verify gpg key with the fingerprint
+  apt_key:
+    id: 0EBFCD88
+    state: present
+  tags:
+    - docker
+  when: docker_valid.failed 
+
+- name: Configure Docker for ubuntu stable repository
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable
+    state: present
+    update_cache: yes
+  tags:
+    - docker
+  when: docker_valid.failed 
+
+- name: Update apt packages
+  apt:
+    update_cache: yes
+  tags:
+    - docker
+  when: docker_valid.failed 
+  
+- name: Install docker-ce
+  apt:
+    name: docker-ce
+    state: present
+    update_cache: yes
+  tags:
+    - docker
+  when: docker_valid.failed 
+
+- name: Check If Docker Compose Is Installed
+  command: docker-compose --version
+  register: docker_valid
+  ignore_errors: yes
+
+- name: Install docker-compose from official github repo
+  get_url:
+    url : https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64
+    dest: /usr/local/bin/docker-compose
+    mode: 'u+x,g+x'
+  when: docker_valid.failed 

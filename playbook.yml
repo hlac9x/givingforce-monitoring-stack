@@ -1,0 +1,25 @@
+---
+# - hosts: all
+#   become: true
+#   roles:
+#   - ./roles/install-docker
+
+- hosts: dev-monitoring-server
+  become: true
+  roles:
+  - ./roles/monitoring-stack
+
+# - hosts: dev-db-server
+#   become: true
+#   roles:
+#   - ./roles/monitoring-mysql
+
+# - hosts: dev-monitoring-clients
+#   become: true
+#   roles:
+#   - ./roles/monitoring-client
+
+# - hosts: web
+#   become: true
+#   roles:
+#   - ./roles/install-nginx

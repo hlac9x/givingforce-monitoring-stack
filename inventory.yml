@@ -1,0 +1,52 @@
+[dev:children]
+dev-monitoring-server
+dev-monitoring-clients
+
+[dev-monitoring-server]
+monitoring   ansible_host=162.55.215.131
+
+
+[dev-monitoring-clients:children]
+dev-server
+dev-db-server
+dev-storage-server
+
+[dev-server]
+dev-server  ansible_port=4222 ansible_host=142.132.163.225
+
+[dev-db-server]
+db1   ansible_host=142.132.165.253  
+db2   ansible_host=116.203.192.16 
+db3   ansible_host=116.203.218.227 
+
+[dev-storage-server]
+storage1  ansible_host=188.34.198.236
+storage2  ansible_host=188.34.198.149
+storage3  ansible_host=188.34.198.162
+
+# [prod:children]
+# web
+# db
+# storage
+
+# [prod-web]
+# web1   ansible_host=168.119.234.117  
+# web2   ansible_host=116.203.206.226  
+# web3   ansible_host=116.203.152.28  
+
+# [prod-db]
+# db1   ansible_host=168.119.234.118 
+# db2   ansible_host=116.203.149.210 
+# db3   ansible_host=116.203.181.154 
+
+# [prod-storage]
+# storage1  ansible_host=116.203.90.195
+# storage2  ansible_host=78.47.120.172  
+# storage3  ansible_host=78.47.150.128 
+
+
+[all:vars]
+ansible_ssh_private_key_file=./gf_hetzner_dev
+ansible_user=root
+ansible_port=22
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'

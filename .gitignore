@@ -1,0 +1,8 @@
+# Copyright (C) 2018-2020 Robert Wimmer
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+molecule/kvm/.vagrant
+david.lac-gta
+dev_key
+gf_hetzner_dev
+prod_key

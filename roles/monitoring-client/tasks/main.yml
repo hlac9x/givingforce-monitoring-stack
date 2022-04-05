@@ -1,0 +1,19 @@
+
+
+- name: Copying the Docker Compose Directory and its contents
+  copy:
+    src: ../files/
+    dest: /root/docker-compose/
+    owner: root
+    group: root        
+    mode: 0644
+
+- name: template file to remote host
+  template:                 # Ansible template module
+    src: "promtail-config.yml.j2"      # This is template src i.e source location 
+    dest: "/root/docker-compose/promtail-config.yml"   # Destination of Remote host
+
+- name: Run container
+  shell:
+    cmd: "docker-compose up -d"
+    chdir: /root/docker-compose/
